@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Suggestion Board</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🎓 College Voice</h1>
+            <div class="space-x-4">
+                <a href="index.html" class="hover:underline">Home</a>
+                <a href="board.html" class="underline font-semibold">Public Board</a>
+                <a href="admin.html" class="hover:underline">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h2 class="text-2xl font-bold text-gray-800">Public Feedback Board</h2>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label class="text-gray-600 text-sm whitespace-nowrap">Filter by:</label>
+                <select id="filterCategory" class="p-2 border border-gray-300 rounded-md bg-white text-sm outline-none w-full sm:w-48">
+                    <option value="All">All Categories</option>
+                    <option value="Academics">Academics</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Hostel & Mess">Hostel & Mess</option>
+                    <option value="Sports & Culture">Sports & Culture</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="boardContainer" class="grid gap-4 grid-cols-1 md:grid-cols-2">
+            </div>
+    </main>
+
+    <script>
+        const container = document.getElementById('boardContainer');
+        const filterSelect = document.getElementById('filterCategory');
+
+        function loadComplaints() {
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            const selectedFilter = filterSelect.value;
+            
+            container.innerHTML = ''; // Clear board
+
+            const filteredList = complaints.filter(c => selectedFilter === 'All' || c.category === selectedFilter);
+
+            if(filteredList.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center col-span-2 py-8">No submissions found for this selection.</p>`;
+                return;
+            }
+
+            filteredList.forEach(c => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded">${c.category}</span>
+                            <span class="text-xs text-gray-400">${c.date}</span>
+                        </div>
+                        <p class="text-gray-700 text-sm md:text-base break-words">${c.title}</p>
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-gray-100 flex justify-between items-center text-xs">
+                        <span class="text-gray-400">User: Anonymous</span>
+                        <span class="px-2 py-0.5 rounded font-medium ${c.status === 'Resolved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${c.status}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        filterSelect.addEventListener('change', loadComplaints);
+        window.addEventListener('DOMContentLoaded', loadComplaints);
+    </script>
+</body>
+</html>

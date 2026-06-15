@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🎓 College Voice (Admin Mode)</h1>
+            <div class="space-x-4">
+                <a href="index.html" class="hover:underline">Home</a>
+                <a href="board.html" class="hover:underline">Public Board</a>
+                <a href="admin.html" class="underline font-semibold">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Manage Submissions</h2>
+            <button onclick="clearAll()" class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded transition cursor-pointer">
+                Clear All Data
+            </button>
+        </div>
+
+        <div class="bg-white shadow rounded-lg overflow-x-auto border border-gray-200">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-200 text-gray-600 text-xs font-semibold uppercase tracking-wider">
+                        <th class="p-4">Date</th>
+                        <th class="p-4">Category</th>
+                        <th class="p-4">Content</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody" class="text-gray-700 text-sm divide-y divide-gray-200">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        function loadAdminData() {
+            const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            if(complaints.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-400">No submissions currently in the system.</td></tr>`;
+                return;
+            }
+
+            complaints.forEach((c, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-4 whitespace-nowrap text-gray-400 text-xs">${c.date}</td>
+                    <td class="p-4 whitespace-nowrap font-medium text-blue-600">${c.category}</td>
+                    <td class="p-4 max-w-xs md:max-w-md truncate">${c.title}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded ${c.status === 'Resolved' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">${c.status}</span>
+                    </td>
+                    <td class="p-4">
+                        <button onclick="toggleStatus(${c.id})" class="text-xs font-medium text-blue-500 hover:text-blue-700 underline cursor-pointer">
+                            Mark as ${c.status === 'Pending' ? 'Resolved' : 'Pending'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleStatus(id) {
+            let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            complaints = complaints.map(c => {
+                if(c.id === id) {
+                    c.status = c.status === 'Pending' ? 'Resolved' : 'Pending';
+                }
+                return c;
+            });
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+            loadAdminData();
+        }
+
+        function clearAll() {
+            if(confirm("Are you sure you want to delete all entries? This cannot be undone.")) {
+                localStorage.removeItem('complaints');
+                loadAdminData();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadAdminData);
+    </script>
+</body>
+</html>

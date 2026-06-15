@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Suggestion - College Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🎓 College Voice</h1>
+            <div class="space-x-4">
+                <a href="index.html" class="underline font-semibold">Home</a>
+                <a href="board.html" class="hover:underline">Public Board</a>
+                <a href="admin.html" class="hover:underline">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-xl">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Anonymous Suggestion Box</h2>
+            <p class="text-gray-600 mb-6 text-sm">Your identity remains completely hidden. Share your feedback safely.</p>
+            
+            <form id="complaintForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Category</label>
+                    <select id="category" class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <option value="">-- Select a Category --</option>
+                        <option value="Academics">Academics</option>
+                        <option value="Infrastructure">Infrastructure</option>
+                        <option value="Hostel & Mess">Hostel & Mess</option>
+                        <option value="Sports & Culture">Sports & Culture</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Your Complaint / Suggestion</label>
+                    <textarea id="title" rows="4" placeholder="Type your details here..." class="w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none" required></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition duration-200 cursor-pointer">
+                    Submit Anonymously
+                </button>
+            </form>
+            <div id="successMsg" class="hidden mt-4 p-3 bg-green-100 text-green-700 rounded-md text-center font-medium">
+                Submission received successfully! 🎉
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('category').value;
+            const title = document.getElementById('title').value;
+            const timestamp = new Date().toLocaleDateString();
+
+            // Structure the data
+            const newComplaint = {
+                id: Date.now(),
+                category: category,
+                title: title,
+                date: timestamp,
+                status: 'Pending'
+            };
+
+            // Pull existing from localStorage or set empty array
+            let complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+            complaints.push(newComplaint);
+            
+            // Save back to localStorage
+            localStorage.setItem('complaints', JSON.stringify(complaints));
+
+            // Reset form & show feedback
+            document.getElementById('complaintForm').reset();
+            const msg = document.getElementById('successMsg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        });
+    </script>
+</body>
+</html>
